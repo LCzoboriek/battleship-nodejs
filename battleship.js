@@ -2,7 +2,8 @@ const { Worker, isMainThread } = require('worker_threads');
 const readline = require('readline-sync');
 const gameController = require("./GameController/gameController.js");
 const cliColor = require('cli-color');
-const beep = require('beepbeep');
+const beep = require('beepbeep'); 
+
 const position = require("./GameController/position.js");
 const letters = require("./GameController/letters.js");
 let telemetryWorker;
@@ -48,8 +49,8 @@ class Battleship {
 
         do {
             console.log();
-            console.log("Player, it's your turn");
-            console.log("Enter coordinates for your shot :");
+            console.log(cliColor.greenBright("Player, it's your turn"));
+            console.log(cliColor.greenBright("Enter coordinates for your shot :"));
             var position = Battleship.ParsePosition(readline.question());
             var isHit = gameController.CheckIsHit(this.enemyFleet, position);
 
@@ -58,45 +59,68 @@ class Battleship {
             if (isHit) {
                 beep();
 
-                console.log("                \\         .  ./");
-                console.log("              \\      .:\";'.:..\"   /");
-                console.log("                  (M^^.^~~:.'\").");
-                console.log("            -   (/  .    . . \\ \\)  -");
-                console.log("               ((| :. ~ ^  :. .|))");
-                console.log("            -   (\\- |  \\ /  |  /)  -");
-                console.log("                 -\\  \\     /  /-");
-                console.log("                   \\  \\   /  /");
+                console.log(cliColor.redBright("                \\         .  ./"));
+                console.log(cliColor.redBright("              \\      .:\";'.:..\"   /"));
+                console.log(cliColor.redBright("                  (M^^.^~~:.'\")."));
+                console.log(cliColor.redBright("            -   (/  .    . . \\ \\)  -"));
+                console.log(cliColor.redBright("               ((| :. ~ ^  :. .|))"));
+                console.log(cliColor.redBright("            -   (\\- |  \\ /  |  /)  -"));
+                console.log(cliColor.redBright("                 -\\  \\     /  /-"));
+                console.log(cliColor.redBright("                   \\  \\   /  /"));
+            } else {
+                console.log(cliColor.blueBright("                \\         .  ./"));
+                console.log(cliColor.blueBright("              \\      .:\";'.:..\"   /"));
+                console.log(cliColor.blueBright("                  (M^^.^~~:.'\")."));
+                console.log(cliColor.blueBright("            -   (/  .    . . \\ \\)  -"));
+                console.log(cliColor.blueBright("               ((| :. ~ ^  :. .|))"));
+                console.log(cliColor.blueBright("            -   (\\- |  \\ /  |  /)  -"));
+                console.log(cliColor.blueBright("                 -\\  \\     /  /-"));
+                console.log(cliColor.blueBright("                   \\  \\   /  /"));
             }
-
-            console.log(isHit ? "Yeah ! Nice hit !" : "Miss");
-
+            
+            if (isHit) {
+                console.log(cliColor.red("Yeah! Nice Hit!"));
+            } else {
+                console.log(cliColor.blue("Miss"));
+            }
+            
             var computerPos = this.GetRandomPosition();
             var isHit = gameController.CheckIsHit(this.myFleet, computerPos);
 
             telemetryWorker.postMessage({eventName: 'Computer_ShootPosition', properties:  {Position: computerPos.toString(), IsHit: isHit}});
 
             console.log();
-            console.log(`Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? `has hit your ship !` : `miss`));
+            console.log(cliColor.yellow((`Computer shot in ${computerPos.column}${computerPos.row} and ` + (isHit ? cliColor.red(`has HIT your ship !`) : cliColor.blue(`MISS`)))));
             if (isHit) {
                 beep();
 
-                console.log("                \\         .  ./");
-                console.log("              \\      .:\";'.:..\"   /");
-                console.log("                  (M^^.^~~:.'\").");
-                console.log("            -   (/  .    . . \\ \\)  -");
-                console.log("               ((| :. ~ ^  :. .|))");
-                console.log("            -   (\\- |  \\ /  |  /)  -");
-                console.log("                 -\\  \\     /  /-");
-                console.log("                   \\  \\   /  /");
+                console.log(cliColor.redBright("                \\         .  ./"));
+                console.log(cliColor.redBright("              \\      .:\";'.:..\"   /"));
+                console.log(cliColor.redBright("                  (M^^.^~~:.'\")."));
+                console.log(cliColor.redBright("            -   (/  .    . . \\ \\)  -"));
+                console.log(cliColor.redBright("               ((| :. ~ ^  :. .|))"));
+                console.log(cliColor.redBright("            -   (\\- |  \\ /  |  /)  -"));
+                console.log(cliColor.redBright("                 -\\  \\     /  /-"));
+                console.log(cliColor.redBright("                   \\  \\   /  /"));
+            } else {
+                console.log(cliColor.blueBright("                \\         .  ./"));
+                console.log(cliColor.blueBright("              \\      .:\";'.:..\"   /"));
+                console.log(cliColor.blueBright("                  (M^^.^~~:.'\")."));
+                console.log(cliColor.blueBright("            -   (/  .    . . \\ \\)  -"));
+                console.log(cliColor.blueBright("               ((| :. ~ ^  :. .|))"));
+                console.log(cliColor.blueBright("            -   (\\- |  \\ /  |  /)  -"));
+                console.log(cliColor.blueBright("                 -\\  \\     /  /-"));
+                console.log(cliColor.blueBright("                   \\  \\   /  /"));
             }
         }
         while (true);
-    }
+    };
 
     static ParsePosition(input) {
         var letter = letters.get(input.toUpperCase().substring(0, 1));
         var number = parseInt(input.substring(1, 2), 10);
         return new position(letter, number);
+        
     }
 
     GetRandomPosition() {
@@ -117,13 +141,14 @@ class Battleship {
     InitializeMyFleet() {
         this.myFleet = gameController.InitializeShips();
 
-        console.log("Please position your fleet (Game board size is from A to H and 1 to 8) :");
+        console.log(cliColor.whiteBright("Please position your fleet (Game board size is from A to H and 1 to 8) :"));
 
         this.myFleet.forEach(function (ship) {
             console.log();
-            console.log(`Please enter the positions for the ${ship.name} (size: ${ship.size})`);
+            console.log(cliColor.magentaBright(`Please enter the positions for the ${ship.name} (size: ${ship.size})`));
             for (var i = 1; i < ship.size + 1; i++) {
-                    console.log(`Enter position ${i} of ${ship.size} (i.e A3):`);
+                    console.log(cliColor.whiteBright(`Enter position ${i} of ${ship.size} (i.e A3):`));
+
                     const position = readline.question();
                     telemetryWorker.postMessage({eventName: 'Player_PlaceShipPosition', properties:  {Position: position, Ship: ship.name, PositionInShip: i}});
                     ship.addPosition(Battleship.ParsePosition(position));
